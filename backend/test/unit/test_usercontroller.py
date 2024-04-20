@@ -1,5 +1,6 @@
 import pytest
-from unittest.mock import MagicMock
+import io
+from unittest.mock import MagicMock, patch
 from src.controllers.usercontroller import UserController
 
 @pytest.fixture
@@ -21,18 +22,15 @@ def test_get_user_by_email_invalid_email(user_controller):
         user_controller.get_user_by_email('invalid_email')
 
 
-def test_get_user_by_email_multiple_users(user_controller, capsys):
+def test_get_user_by_email_multiple_users(user_controller):
     """ Mocking the result of returning a users infomation with multiple user connected to one email """
-    # Record the diffrent outputs for the console
-    captured = capsys.readouterr()
-
     user_controller.dao.find.return_value = [{'email': 'test@example.com', 'name': 'Test User 1'},
                                              {'email': 'test@example.com', 'name': 'Test User 2'}]
-    
-    user = user_controller.get_user_by_email('test@example.com')
-    
-    assert user == user_controller.dao.find.return_value[0]
-    assert captured.out == 'Error: more than one user found with mail test@example.com'
+
+    with patch('sys.stdout', new_callable=io.StringIO) as stdout_mock:
+            user = user_controller.get_user_by_email('test@example.com')
+            assert user == user_controller.dao.find.return_value[0]
+            assert stdout_mock.getvalue() == 'Error: more than one user found with mail test@example.com\n'
 
 def test_update(user_controller):
     user_controller.update = MagicMock(return_value=True)
