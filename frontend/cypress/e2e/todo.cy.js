@@ -58,13 +58,35 @@ describe('Manipulate todo list associated to a task', () => {
         cy.get('.inline-form')
             .submit()
 
-        cy.get('.editable').contains('Description of todo item')
+        cy.get('.editable').eq(3).contains(todo.description)
     })
 
     it('clicking add with empty description should not be possible', () => {
         cy.get('.inline-form')
             .find('input[type=submit]')
             // .should('be.disabled')
+    })
+
+    it('clicking checker icon should set item to done and struck through if active', () => {
+        cy.get('.checker').eq(1).should('have.class', 'unchecked')
+        cy.get('.checker').eq(1).click()
+        cy.get('.checker').eq(1).should('have.class', 'checked')
+        cy.get('.editable').eq(3)
+            .invoke('css', 'text-decoration')
+            .should('contain', 'line-through')
+    })
+
+    it('clicking checker icon should set item to active and not struck through if done', () => {
+        cy.get('.checker').eq(1).click()
+        cy.get('.checker').eq(1).should('have.class', 'unchecked')
+        cy.get('.editable').eq(3)
+            .invoke('css', 'text-decoration')
+            .should('not.contain', 'line-through')
+    })
+
+    it('item should be deleted if clicking X symbol', () => {
+        cy.get('.remover').eq(1).click()
+        cy.get('.remover').eq(1).should('not.exist')
     })
 
     after(function () {
