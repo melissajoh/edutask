@@ -7,7 +7,10 @@ describe('Manipulate todo list associated to a task', () => {
         "description": "Description of task 1"
     }
     let todo = {
-        "description": "Description of todo item"
+        "description": "Added todo item"
+    }
+    let setup = {
+        "description": "Setup todo item"
     }
 
     before(function () {
@@ -24,16 +27,13 @@ describe('Manipulate todo list associated to a task', () => {
             name = user.firstName + ' ' + user.lastName
             email = user.email
         })
-        })
-    })
 
-    beforeEach(function () {
         cy.visit('http://localhost:3000')
 
         //login
         cy.contains('div', 'Email Address')
             .find('input[type=text]')
-            .type(email)
+            .type(user.email)
 
         cy.get('form')
             .submit()
@@ -45,8 +45,31 @@ describe('Manipulate todo list associated to a task', () => {
 
         cy.get('form')
             .submit()
+        })
 
-        // click on task
+        // add todo item
+        cy.contains('div', 'Task 1').click()
+        cy.get('.inline-form')
+        .find('input[type=text]')
+        .type(setup.description)
+
+        cy.get('.inline-form')
+            .submit()
+    })
+
+    beforeEach(function () {
+        cy.viewport(1280, 1000)
+        cy.visit('http://localhost:3000')
+
+        // login
+        cy.contains('div', 'Email Address')
+            .find('input[type=text]')
+            .type(email)
+
+        cy.get('form')
+            .submit()
+
+        // detail view for task 1
         cy.contains('div', 'Task 1').click()
     })
 
@@ -58,35 +81,45 @@ describe('Manipulate todo list associated to a task', () => {
         cy.get('.inline-form')
             .submit()
 
-        cy.get('.editable').eq(3).contains(todo.description)
+        cy.contains(todo.description).should('exist')
     })
 
     it('clicking add with empty description should not be possible', () => {
         cy.get('.inline-form')
             .find('input[type=submit]')
-            // .should('be.disabled')
+            .should('be.disabled')
     })
 
     it('clicking checker icon should set item to done and struck through if active', () => {
-        cy.get('.checker').eq(1).should('have.class', 'unchecked')
-        cy.get('.checker').eq(1).click()
-        cy.get('.checker').eq(1).should('have.class', 'checked')
-        cy.get('.editable').eq(3)
+        cy.contains(setup.description).parent().get('.checker').should('have.class', 'unchecked')
+        cy.contains(setup.description).parent().find('.checker').click()
+        cy.contains(setup.description).parent().get('.checker').should('have.class', 'checked')
+        cy.contains(setup.description)
             .invoke('css', 'text-decoration')
             .should('contain', 'line-through')
+        cy.contains(setup.description).parent().find('.checker').click()
     })
 
     it('clicking checker icon should set item to active and not struck through if done', () => {
-        cy.get('.checker').eq(1).click()
-        cy.get('.checker').eq(1).should('have.class', 'unchecked')
-        cy.get('.editable').eq(3)
+        cy.contains(setup.description).parent().find('.checker').click()
+        cy.contains(setup.description).parent().find('.checker').click()
+        cy.contains(setup.description).parent().find('.checker').should('have.class', 'unchecked')
+        cy.contains(setup.description)
             .invoke('css', 'text-decoration')
             .should('not.contain', 'line-through')
     })
 
     it('item should be deleted if clicking X symbol', () => {
-        cy.get('.remover').eq(1).click()
-        cy.get('.remover').eq(1).should('not.exist')
+        cy.get('.inline-form')
+            .find('input[type=text]')
+            .type('delete me')
+
+        cy.get('.inline-form')
+            .submit()
+
+        cy.contains('delete me').parent().find('.remover').click()
+        cy.contains('delete me').parent().find('.remover').click()
+        cy.contains('delete me').should('not.exist')
     })
 
     after(function () {
