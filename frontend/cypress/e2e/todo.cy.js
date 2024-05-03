@@ -2,6 +2,7 @@ describe('Manipulate todo list associated to a task', () => {
     let uid
     let name
     let email
+    let taskid
     let task = {
         "title": "Task 1",
         "description": "Description of task 1"
@@ -122,7 +123,23 @@ describe('Manipulate todo list associated to a task', () => {
         cy.contains('delete me').should('not.exist')
     })
 
+    afterEach(function () {
+        cy.request({
+            method: 'GET',
+            url: `http://localhost:5000/tasks/ofuser/${uid}`
+        }).then((response) => {
+            console.log(response)
+            taskid = response.body[0]._id.$oid
+        })
+    })
+
     after(function () {
+        cy.request({
+            method: 'DELETE',
+            url: `http://localhost:5000/tasks/byid/${taskid}`
+        }).then((response) => {
+            cy.log(response.body)
+        })
         cy.request({
             method: 'DELETE',
             url: `http://localhost:5000/users/${uid}`
