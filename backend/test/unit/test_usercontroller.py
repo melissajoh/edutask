@@ -8,6 +8,7 @@ def user_controller():
     mock_dao = MagicMock()
     return UserController(dao=mock_dao)
 
+@pytest.mark.unit
 def test_get_user_by_email_valid_email(user_controller):
     """ Mocking the result of returning a users infomation with only one user connected to one email"""
     user_controller.dao.find.return_value = [{'email': 'test@example.com', 'name': 'Test User'}]
@@ -16,12 +17,13 @@ def test_get_user_by_email_valid_email(user_controller):
 
     assert user == user_controller.dao.find.return_value[0]
 
+@pytest.mark.unit
 def test_get_user_by_email_invalid_email(user_controller):
     """ Testing get user infomation from an invalid email"""
     with pytest.raises(ValueError):
         user_controller.get_user_by_email('invalid_email')
 
-
+@pytest.mark.unit
 def test_get_user_by_email_multiple_users(user_controller):
     """ Mocking the result of returning a users infomation with multiple user connected to one email """
     user_controller.dao.find.return_value = [{'email': 'test@example.com', 'name': 'Test User 1'},
@@ -39,6 +41,7 @@ def test_update(user_controller):
 
     assert update_result == True
 
+@pytest.mark.unit
 def test_get_user_by_email_valid_no_user(user_controller):
     """ Testing get user information from valid email with no users """
     # with pytest.raises(TypeError):
