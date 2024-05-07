@@ -22,6 +22,7 @@ def dao(mock_getValidator):
     dao = DAO("test")
     return dao
 
+@pytest.mark.integration
 def test_create_all_correct(dao):
     """ Test valid data correct properties, bson and uniqueItems, returning object """
     test_dict = {'title': 'Unique', 'description': 'Description added'}
@@ -29,6 +30,7 @@ def test_create_all_correct(dao):
     result = dao.create(test_dict)
     assert result.keys() == expected_res.keys()
 
+@pytest.mark.integration
 def test_create_incorrect_properties(dao):
     """ Test valid data with incorrect properties, raising WriteError """
     with pytest.raises(pymongo.errors.WriteError):
@@ -36,6 +38,7 @@ def test_create_incorrect_properties(dao):
         result = dao.create(test_dict)
         assert result == Exception
 
+@pytest.mark.integration
 def test_create_incorrect_bson(dao):
     """ Test valid data with incorrect bson type, raising WriteError """
     with pytest.raises(pymongo.errors.WriteError):
@@ -51,6 +54,7 @@ def test_create_incorrect_uniqueItems(dao):
         result = dao.create(test_dict)
         assert result == Exception
 
+@pytest.mark.integration
 def test_create_invalid_data(dao):
     """ Test invalid data, raising Exception """
     with pytest.raises(Exception):
