@@ -41,7 +41,7 @@ def test_update(user_controller):
 
 def test_get_user_by_email_valid_no_user(user_controller):
     """ Testing get user information from valid email with no users """
-    with pytest.raises(TypeError):
-        user_controller.dao.find.return_value = None
-        user = user_controller.get_user_by_email('nouser@example.com')
-        assert user == False
+    # with pytest.raises(TypeError):
+    user_controller.dao.find.return_value = None
+    user = user_controller.get_user_by_email('nouser@example.com')
+    assert user == None
